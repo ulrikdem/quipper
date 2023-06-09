@@ -1,0 +1,76 @@
+Using the Quipper tools
+=======================
+
+The quipper-tools package contains a number of stand-alone Quipper
+programs, most of which read a circuit in the Quipper ASCII format on
+standard input. These tools are intended as examples; they illustrate
+how other such tools can be written. Each tool also has a --help
+option to display usage information.
+
+Graphical viewing of circuits:
+------------------------------
+
+* quipper-eps: convert a circuit from ASCII to EPS format.
+
+* quipper-pdf: convert a circuit from ASCII to PDF format.
+
+* quipper-preview: read a circuit and launch the previewer.
+
+Decomposing circuits into different gate sets:
+----------------------------------------------
+
+* quipper-approximate: decompose rotation and phase gates into the
+  Clifford+T base, using the approximate synthesis algorithm of 
+  http://arxiv.org/abs/1403.2975.
+
+* quipper-binary: decompose a circuit into binary gates.
+
+* quipper-cliffordt: decompose a circuit into the Clifford+T base,
+  using both exact and approximate synthesis.
+
+* quipper-exact: decompose all gates that permit exact Clifford+T
+  representations into the following gates: controlled-not (with
+  positive or negative control), and single-qubit Clifford gate, T,
+  and T⁻¹.  Classical controls and classical gates are not subject to
+  the gate base, and are left untouched.
+
+* quipper-standard: decompose a circuit into the "standard" gates {X,
+  Y, Z, H, S, S⁻¹, T, T⁻¹, CNOT}, using exact and approximate
+  synthesis.
+
+* quipper-strict: decompose a circuit into the gates {H, S, T, CNOT},
+  using exact and approximate synthesis.
+
+* quipper-trimcontrols: trim excess controls from gates, so that the
+  gates {NOT, X, Y, Z, iX} have at most two controls, phase gates have
+  no controls, and all other gates have at most one control.
+
+* quipper-unbox: unwind a circuit by inlining all top-level boxed
+  subroutines. This can substantially increase the size of the circuit
+  representation. 
+
+Resource analysis:
+------------------
+
+* quipper-depth: read a circuit and output its depth.
+
+* quipper-gatecount: read a circuit and output gate counts.
+
+Simulation:
+-----------
+
+* quipper-simulate: read a circuit and simulate it by applying it to
+  every posssible basis vector. This is not efficient and only works
+  for very small circuits. Any measurements in the circuit will be
+  simulated probabilistically.
+
+Miscellaneous:
+--------------
+
+* quipper-ascii: the identity function on circuits: read a circuit on
+  standard output and then output the same circuit to standard
+  output. Illustrates how to parse and output the Quipper ASCII
+  circuit format.
+
+* quipper-qclparser: read an execution trace produced by Ömer's QCL,
+  and turn it into a Quipper circuit.
