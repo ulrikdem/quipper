@@ -43,10 +43,6 @@ template_zip = return $ \a -> return $ \b -> return (zip a b)
 template_tail :: Circ ([a] -> Circ [a])
 template_tail = return $ \t -> return $ tail t
 
--- | Template Haskell version of @[]@.
-template_symb_obracket_symb_cbracket_ :: Circ [a]
-template_symb_obracket_symb_cbracket_ = return []
-
 -- | Monadic version of 'mapAccumL'.
 mapAccumLM :: (acc -> x -> Circ (acc,y)) -> acc -> [x] -> Circ (acc,[y])
 mapAccumLM f acc [] = return (acc,[])
