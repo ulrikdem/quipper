@@ -18,7 +18,7 @@ be_boollist_sub = error "be_boollist_sub yet undefined."
 -- Template version of 'be_boollist_sub'.
 
 -- Right now, call to q_sub.
--- template_be_boollist_sub :: Circ ([Qubit] -> Circ ([Qubit] -> Circ [Qubit]))
+template_be_boollist_sub :: Circ ([Qubit] -> Circ ([Qubit] -> Circ [Qubit]))
 template_be_boollist_sub = return $ \x -> return $ \y -> do
                 let x' = qdint_of_qulist_bh x
                 let y' = qdint_of_qulist_bh y
@@ -38,7 +38,7 @@ be_boollist_add = error "be_boollist_add yet undefined."
 -- Template version of 'be_boollist_add'
 
 -- Right now, call q_add
--- template_be_boollist_add :: Circ ([Qubit] -> Circ ([Qubit] -> Circ [Qubit]))
+template_be_boollist_add :: Circ ([Qubit] -> Circ ([Qubit] -> Circ [Qubit]))
 template_be_boollist_add = return $ \x -> return $ \y -> do
                 let x' = qdint_of_qulist_bh x
                 let y' = qdint_of_qulist_bh y
