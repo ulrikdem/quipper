@@ -655,7 +655,6 @@ data ReadWrite a = RW_Return a
                  | RW_Subroutine BoxId TypedSubroutine (ReadWrite a)
 
 instance Monad ReadWrite where
-  return a = RW_Return a
   f >>= g = case f of
     RW_Return a -> g a
     RW_Write gate f' -> RW_Write gate (f' >>= g)
@@ -663,7 +662,7 @@ instance Monad ReadWrite where
     RW_Subroutine name subroutine f' -> RW_Subroutine name subroutine (f' >>= g)
 
 instance Applicative ReadWrite where
-  pure = return
+  pure a = RW_Return a
   (<*>) = ap
 
 instance Functor ReadWrite where

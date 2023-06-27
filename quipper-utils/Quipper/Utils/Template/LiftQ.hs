@@ -41,14 +41,13 @@ type LiftQState = StateT LiftState ErrMsgQ
 data LiftQ a = LiftQ (LiftQState a)
 
 instance Monad LiftQ where
-  return x = LiftQ $ return x
   (>>=) (LiftQ x) f = LiftQ $ do
            x' <- x
            let (LiftQ y) = f x'
            y
 
 instance Applicative LiftQ where
-  pure = return
+  pure x = LiftQ $ return x
   (<*>) = ap
 
 instance Functor LiftQ where

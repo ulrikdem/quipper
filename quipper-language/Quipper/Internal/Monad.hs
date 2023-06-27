@@ -273,7 +273,6 @@ initial_state arity = empty_state { arity = arity }
 newtype Circ a = Circ { getCirc :: State -> ReadWrite (a, State) }
 
 instance Monad Circ where
-  return a = Circ (\s -> return (a, s))
   f >>= g = Circ h
     where
       h s0 = do
@@ -282,7 +281,7 @@ instance Monad Circ where
 
 -- every monad is applicative, and so is this one
 instance Applicative Circ where
-  pure = return
+  pure a = Circ (\s -> return (a, s))
   (<*>) = ap
 
 -- every monad is a functor, and so is this one

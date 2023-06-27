@@ -300,13 +300,12 @@ initExpState ws_in ws_out gs = ExpState {
 data EvalCirc a =  EvalCirc (ExpState -> (ExpState, a))
 
 instance Monad EvalCirc where
-  return x = EvalCirc (\y -> (y,x))
   (>>=) (EvalCirc c) f = EvalCirc (\s -> let (s',x) = c s in
                                  let (EvalCirc c') = f x in
                                  c' s')
 
 instance Applicative EvalCirc where
-  pure = return
+  pure x = EvalCirc (\y -> (y,x))
   (<*>) = ap
 
 instance Functor EvalCirc where

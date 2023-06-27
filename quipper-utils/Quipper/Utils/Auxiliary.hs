@@ -761,11 +761,10 @@ strbuf_concat = blist_concat
 newtype Id a = Id { getId :: a }
 
 instance Monad Id where
-  return a = Id a
   (Id a) >>= b = b a
 
 instance Applicative Id where
-  pure = return
+  pure a = Id a
   (<*>) = ap
 
 instance Functor Id where

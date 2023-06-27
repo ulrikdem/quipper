@@ -286,11 +286,10 @@ instance (Floating r, Random r, Ord r, RandomGen g) => PMonad r (State g) where
 
 -- | Any numeric indexed vector forms a 'Monad'.
 instance (Num n) => Monad (Vector n) where
-        return a = Vector [(a,1)]
         (Vector ps) >>= f = Vector [(b,i*j) | (a,i) <- ps, (b,j) <- removeVector (f a)] where removeVector (Vector as) = as 
 
 instance (Num n) => Applicative (Vector n) where
-  pure = return
+  pure a = Vector [(a,1)]
   (<*>) = ap
 
 instance (Num n) => Functor (Vector n) where

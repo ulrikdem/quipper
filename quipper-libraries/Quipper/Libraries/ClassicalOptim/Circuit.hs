@@ -62,13 +62,12 @@ emptyState = CS {circuit = [], freshWire = 0}
 data Circ a =  Circ (CircState -> (CircState, a))
 
 instance Monad Circ where
-  return x = Circ (\y -> (y,x))
   (>>=) (Circ c) f = Circ (\s -> let (s',x) = c s in
                                  let (Circ c') = f x in
                                  c' s')
 
 instance Applicative Circ where
-  pure = return
+  pure x = Circ (\y -> (y,x))
   (<*>) = ap
 
 instance Functor Circ where

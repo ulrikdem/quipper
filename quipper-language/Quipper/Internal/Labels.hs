@@ -86,14 +86,13 @@ newtype LabelMonad a = LabelMonad {
   }
 
 instance Monad LabelMonad where
-  return a = LabelMonad (\idxl -> (Map.empty, a))
   f >>= g = LabelMonad h where
     h idxl = (Map.union m1 m2, z) where
       (m1, y) = getLabelMonad f idxl
       (m2, z) = getLabelMonad (g y) idxl
 
 instance Applicative LabelMonad where
-  pure = return
+  pure a = LabelMonad (\idxl -> (Map.empty, a))
   (<*>) = ap
 
 instance Functor LabelMonad where

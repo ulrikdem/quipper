@@ -15,7 +15,6 @@ type ErrMsg a = Either String a
 data ErrMsgQ a = ErrMsgQ (Q (ErrMsg a))
 
 instance Monad ErrMsgQ where
-    return x = ErrMsgQ $ return $ return x
     (>>=) (ErrMsgQ x) f = ErrMsgQ $ do
               x' <- x
               case x' of 
@@ -23,7 +22,7 @@ instance Monad ErrMsgQ where
                  Right r -> let (ErrMsgQ y) = f r in y
 
 instance Applicative ErrMsgQ where
-  pure = return
+  pure x = ErrMsgQ $ return $ return x
   (<*>) = ap
 
 instance Functor ErrMsgQ where
