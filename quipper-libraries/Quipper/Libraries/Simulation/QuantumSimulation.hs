@@ -326,8 +326,8 @@ get_trace qs (Vector amps) = Vector ps
 add :: (Floating r) => ((Map Qubit Bool),Cplx r) -> Amplitudes r -> Amplitudes r
 add (a,x) (Vector axs) = Vector (add' axs)
   where add' [] = [(a,x)]
-        add' ((by @ (b,y)):bys) | a == b = (b,x+y):bys
-                                | otherwise = by:(add' bys)
+        add' ((by@(b,y)):bys) | a == b = (b,x+y):bys
+                              | otherwise = by:(add' bys)
 
 -- | The apply' function is used to apply a function on \"basis states\" to an 
 -- entire amplitude distribution. 
