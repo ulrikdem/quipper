@@ -1,0 +1,11 @@
+digraph {
+    "quipper" -> {"quipper-language" "quipper-libraries" "quipper-tools"}
+    "quipper-algorithms" -> {"quipper-utils" "quipper-language" "quipper-libraries" "quipper-cabal"}
+    "quipper-all" -> {"quipper" "quipper-algorithms" "quipper-demos"}
+    "quipper-cabal" -> {"quipper-language"}
+    "quipper-demos" -> {"quipper-utils" "quipper-language" "quipper-libraries" "quipper-cabal"}
+    "quipper-language" -> {"quipper-utils"}
+    "quipper-libraries" -> {"quipper-utils" "quipper-language" "quipper-cabal"}
+    "quipper-tools" -> {"quipper-utils" "quipper-language" "quipper-libraries" "quipper-cabal"}
+    "quipper-utils" -> {}
+}
