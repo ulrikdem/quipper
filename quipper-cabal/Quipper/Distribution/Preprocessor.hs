@@ -6,13 +6,12 @@
 
 module Quipper.Distribution.Preprocessor where
 
+import Quipper.Internal.Preprocessor
+
 import Distribution.Simple.PreProcess
 import Distribution.Simple.Utils
-import System.Environment
 import System.Exit
 import System.IO
-import System.IO.Error
-import System.Process
 
 -- To prevent CPP from expanding a macro in a Haskell comment.
 #define literal(x) x
@@ -43,21 +42,13 @@ ppQuipper =
     runPreProcessor = mkSimplePreProcessor f
     }
   where
-    f inFile outFile verbosity = catchIOError body handler
-      where
-        body = do
-          info verbosity ("Preprocessing " ++ inFile ++ " to " ++ outFile)
-          (exitcode, out, err) <- readProcessWithExitCode "quipper-pp" [inFile, inFile, outFile] ""
-          case exitcode of
-            ExitSuccess -> return ()
-            ExitFailure n -> quipper_pp_error err
-        handler e = do
-          name <- getProgName
-          hPutStrLn stdout ""
-          hPutStrLn stdout $ name ++ ": unable to run the Quipper preprocessor. Please make sure that quipper-pp is installed and on your PATH. Note that quipper-pp can be found in the package quipper-language."
-          hPutStrLn stdout ""
-          exitFailure
-        quipper_pp_error err = do
-          hPutStrLn stdout ""
-          hPutStrLn stdout err
-          exitFailure
+    f inFile outFile verbosity = do
+      info verbosity ("Preprocessing " ++ inFile ++ " to " ++ outFile)
+      (exitcode, err) <- preprocess_file inFile inFile outFile
+      case exitcode of
+        ExitSuccess -> return ()
+        ExitFailure n -> quipper_pp_error err
+    quipper_pp_error err = do
+      hPutStrLn stdout ""
+      hPutStrLn stdout err
+      exitFailure
