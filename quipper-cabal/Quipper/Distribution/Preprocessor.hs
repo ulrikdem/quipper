@@ -39,6 +39,7 @@ ppQuipper :: PreProcessor
 ppQuipper =
   PreProcessor {
     platformIndependent = True,
+    ppOrdering = unsorted,
     runPreProcessor = mkSimplePreProcessor f
     }
   where
