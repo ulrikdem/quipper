@@ -240,7 +240,6 @@ data Document a =
                                           -- known at the end.
 
 instance Monad Document where
-  return a = Document_Return a
   f >>= g = case f of
     Document_Return a -> g a
     Document_Page x y draw -> Document_Page x y draw' where
@@ -253,7 +252,7 @@ instance Monad Document where
         return (x, y, f' >>= g)
                      
 instance Applicative Document where
-  pure = return
+  pure = Document_Return
   (<*>) = ap
 
 instance Functor Document where
@@ -375,7 +374,6 @@ data Draw a =
     deriving (Show)
     
 instance Monad Draw where
-  return a = Draw_Return a
   f >>= g = case f of
     Draw_Return a -> g a
     Draw_Write cmd f' -> Draw_Write cmd (f' >>= g)
@@ -385,7 +383,7 @@ instance Monad Draw where
         return (f' >>= g)
 
 instance Applicative Draw where
-  pure = return
+  pure = Draw_Return
   (<*>) = ap
 
 instance Functor Draw where
@@ -840,14 +838,13 @@ data Writer a =
   | Writer_PutStr String (Writer a)  -- ^ Write a string.
 
 instance Monad Writer where
-  return a = Writer_Return a
   f >>= g = case f of
     Writer_Return a -> g a
     Writer_PutChar c f' -> Writer_PutChar c (f' >>= g)
     Writer_PutStr s f' -> Writer_PutStr s (f' >>= g) 
     
 instance Applicative Writer where
-  pure = return
+  pure = Writer_Return
   (<*>) = ap
 
 instance Functor Writer where
@@ -919,7 +916,6 @@ unbox :: Boxed m a -> m a
 unbox (Boxed x) = x
 
 instance Monad m => Monad (Boxed m) where
-  return a = Boxed (return a)
   f >>= g = Boxed (unbox f >>= (unbox . g))
 
 instance Applicative m => Applicative (Boxed m) where
