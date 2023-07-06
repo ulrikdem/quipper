@@ -1,6 +1,6 @@
 # Quipper
 
-This is a version of [Quipper](https://www.mathstat.dal.ca/~selinger/quipper/) updated to work with current versions of GHC (tested with 9.2.8) and dependencies.
+This is a version of [Quipper](https://www.mathstat.dal.ca/~selinger/quipper/) updated to work with current versions of GHC (tested with 9.6.2) and dependencies.
 
 It is updated to work with Cabal new-style builds, so, assuming `cabal-install` 3.0 or later, you can build any of the packages by running `cabal build <package>` in this directory, or run any of the included programs with `cabal run <program>`.
 (This does not work for `quipper`, `quipperi` or `quipperdoc`, which require `quipper-pp` to be installed in the PATH.)
