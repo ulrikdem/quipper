@@ -45,7 +45,7 @@ import System.IO
 import Text.Printf
 
 import Control.Applicative (Applicative(..))
-import Control.Monad (liftM, ap)
+import Control.Monad (liftM, ap, when)
 
 -- ----------------------------------------------------------------------
 -- * Types
