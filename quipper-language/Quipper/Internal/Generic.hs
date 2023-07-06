@@ -8,6 +8,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE Rank2Types #-} 
 {-# LANGUAGE DoAndIfThenElse #-}
+{-# LANGUAGE TypeOperators #-}
 
 -- | This module provides functions and operators that are \"generic\"
 -- on quantum data. We say that a function is generic if it works at

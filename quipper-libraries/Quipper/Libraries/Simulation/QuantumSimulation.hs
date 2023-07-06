@@ -7,6 +7,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE TypeOperators #-}
 
 -- | This module provides functions for simulating circuits, 
 -- for testing and debugging purposes. 
