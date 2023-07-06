@@ -14,6 +14,7 @@ import Quipper hiding (cnot, Format)
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
 import qualified Data.Traversable as Trav
+import Control.Monad
 import Control.Monad.State
 import Prelude hiding (not)
 import qualified Prelude
