@@ -77,6 +77,7 @@ module Quipper.Internal.CircLifting (
 
 
   -- * Circuits for specific operations
+  template_getParam,
   -- ** Boolean parameters
   
   template_newBool,
@@ -93,8 +94,15 @@ module Quipper.Internal.CircLifting (
   -- ** The if-then-else operation
   -- $IF
   template_if,
-  -- ** Equality test
+  -- ** Equality and ordering
   template_symb_equal_symb_equal_,
+  -- template_symb_slash_symb_equal_,
+  -- template_symb_oangle_,
+  -- template_symb_cangle_,
+  -- template_symb_oangle_symb_equal_,
+  -- template_symb_cangle_symb_equal_,
+  -- template_max,
+  -- template_min,
 
   -- * Generic unpacking
   CircLiftingUnpack(..)
@@ -297,6 +305,9 @@ decToCircMonad x = decToMonad "Circ" x
 -- ----------------------------------------------------------------------
 -- * Circuits for specific operations
 
+template_getParam :: (QShape ba qa ca) => Circ (Param ba -> Circ qa)
+template_getParam = return $ \(Param x) -> qinit x
+
 -- ** Boolean parameters
 
 -- | Lifted version of 'newBool':
@@ -456,6 +467,51 @@ template_if x a b = do
 -- > (==) :: Eq a => a -> a -> Bool
 template_symb_equal_symb_equal_ :: (QEq qa) => Circ (qa -> Circ (qa -> Circ Qubit))
 template_symb_equal_symb_equal_ = return $ \qx -> return $ \qy -> do (qx,qy,test) <- q_is_equal qx qy; return test
+
+-- | Lifted version of the '/=' operator:
+-- 
+-- > (/=) :: Eq a => a -> a -> Bool
+-- template_symb_slash_symb_equal_ :: (QEq qa) => Circ (qa -> Circ (qa -> Circ Qubit))
+-- template_symb_slash_symb_equal_ = return $ \qx -> return $ \qy -> do (qx,qy,test) <- q_is_not_equal qx qy; return test
+
+-- ----------------------------------------------------------------------
+-- * Operations of the Ord class
+
+-- | Lifted version of the '<' operator:
+-- 
+-- > (<) :: Ord a => a -> a -> Bool
+-- template_symb_oangle_ :: (QOrd qa) => Circ (qa -> Circ (qa -> Circ Qubit))
+-- template_symb_oangle_ = return $ \qx -> return $ \qy -> q_less qx qy
+
+-- | Lifted version of the '>' operator:
+-- 
+-- > (>) :: Ord a => a -> a -> Bool
+-- template_symb_cangle_ :: (QOrd qa) => Circ (qa -> Circ (qa -> Circ Qubit))
+-- template_symb_cangle_ = return $ \qx -> return $ \qy -> q_greater qx qy
+
+-- | Lifted version of the '<=' operator:
+-- 
+-- > (<=) :: Ord a => a -> a -> Bool
+-- template_symb_oangle_symb_equal_ :: (QOrd qa) => Circ (qa -> Circ (qa -> Circ Qubit))
+-- template_symb_oangle_symb_equal_ = return $ \qx -> return $ \qy -> q_leq qx qy
+
+-- | Lifted version of the '>=' operator:
+-- 
+-- > (>=) :: Ord a => a -> a -> Bool
+-- template_symb_cangle_symb_equal_ :: (QOrd qa) => Circ (qa -> Circ (qa -> Circ Qubit))
+-- template_symb_cangle_symb_equal_ = return $ \qx -> return $ \qy -> q_geq qx qy
+
+-- | Lifted version of the 'max' function:
+-- 
+-- > max :: Ord a => a -> a -> a
+-- template_max :: (QOrd qa) => Circ (qa -> Circ (qa -> Circ qa))
+-- template_max = return $ \qx -> return $ \qy -> q_max qx qy
+
+-- | Lifted version of the 'min' function:
+-- 
+-- > min :: Ord a => a -> a -> min
+-- template_min :: (QOrd qa) => Circ (qa -> Circ (qa -> Circ qa))
+-- template_min = return $ \qx -> return $ \qy -> q_min qx qy
 
 -- ----------------------------------------------------------------------
 -- * Generic unpacking

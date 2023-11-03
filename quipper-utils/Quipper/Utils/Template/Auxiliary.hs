@@ -12,6 +12,60 @@ import Quipper.Utils.Auxiliary (fold_right_zip,fold_right_zipM)
 import Data.List
 import Control.Monad
 
+newtype Param a = Param {getParam :: a}
+
+instance Functor Param where
+  fmap f (Param x) = Param (f x)
+
+instance Applicative Param where
+  pure = Param
+  Param f <*> Param x = Param (f x)
+
+instance Monad Param where
+  Param x >>= f = f x
+
+instance Foldable Param where
+  foldMap f (Param x) = f x
+
+instance Traversable Param where
+  sequenceA (Param x) = fmap Param x
+
+liftP0 :: a -> Param a
+liftP0 = return
+
+liftP :: (a -> b) -> Param a -> Param b
+liftP = liftM
+
+liftP2 :: (a -> b -> c) -> Param a -> Param b -> Param c
+liftP2 = liftM2
+
+liftP3 :: (a -> b -> c -> d) -> Param a -> Param b -> Param c -> Param d
+liftP3 = liftM3
+
+liftP4 :: (a -> b -> c -> d -> e) -> Param a -> Param b -> Param c -> Param d -> Param e
+liftP4 = liftM4
+
+liftP5 :: (a -> b -> c -> d -> e -> f) -> Param a -> Param b -> Param c -> Param d -> Param e -> Param f
+liftP5 = liftM5
+
+-- template_fmap :: (Monad m, Traversable f) => m ((a -> m b) -> m (f a -> m (f b)))
+-- template_fmap = return $ return . sequence . fmap
+-- template_pure :: (Monad m, Applicative f) => m (a -> m (f a))
+-- template_pure = return $ return . pure
+-- template_symb_oangle_symb_star_symb_cangle_ :: (Monad m, Applicative f, Traversable f) => m (f (a -> m b) -> m (f a -> m (f b)))
+-- template_symb_oangle_symb_star_symb_cangle_ = return $ \f -> return $ \x -> sequence $ f <*> x
+-- template_symb_cangle_symb_cangle_symb_equal_ :: (Monad m, Monad f) => m (f a -> m ((a -> m (f b)) -> m (f b)))
+-- template_symb_cangle_symb_cangle_symb_equal_ = return $ \x -> return $ \f -> x >>= f
+
+-- template_fmap :: (Monad m, Functor f) => m ((a -> b) -> m (f a -> m (f b)))
+-- template_fmap = return $ \f -> return $ \x -> return $ fmap f x
+-- template_pure :: (Monad m, Applicative f) => m (a -> m (f a))
+-- template_pure = return $ \x -> return $ pure x
+-- template_symb_oangle_symb_star_symb_cangle_ :: (Monad m, Applicative f) => m (f (a -> b) -> m (f a -> m (f b)))
+-- template_symb_oangle_symb_star_symb_cangle_ = return $ \f -> return $ \x -> return $ f <*> x
+-- template_symb_cangle_symb_cangle_symb_equal_ :: (Monad m, Monad f) => m (f a -> m ((a -> f b) -> m (f b)))
+-- template_symb_oangle_symb_star_symb_cangle_ = return $ \x -> return $ \f -> return $ x >>= f
+
 -- ----------------------------------------------------------------------
 -- * List operations
 

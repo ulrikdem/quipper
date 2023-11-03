@@ -1,11 +1,13 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE PatternGuards #-}
 
 -- | This module describes stripped-down Template Haskell abstract
 -- syntax trees (ASTs) for a subset of Haskell.
 
 module Quipper.Utils.Template.Lifting where
 
+import Control.Monad
 import Control.Monad.State
 
 import qualified Data.Map as Map
@@ -21,6 +23,7 @@ import Data.Set (Set)
 import qualified Language.Haskell.TH as TH
 import Language.Haskell.TH (Name)
 
+import Quipper.Utils.Template.Auxiliary
 -- Get the monad to build the lifting.
 import Quipper.Utils.Template.LiftQ
 
@@ -97,6 +100,7 @@ getVarNames :: Pat -> Set Name
 getVarNames (VarP n) = Set.singleton n
 getVarNames (TupP pats) = Set.unions $ map getVarNames pats
 getVarNames (ListP pats) = Set.unions $ map getVarNames pats
+getVarNames (ConP _ pats) = Set.unions $ map getVarNames pats
 getVarNames _ = Set.empty
 
 -- | Substitution in a @'Match'@.
@@ -121,7 +125,8 @@ substExp n s (LamE m exp) | n == m = LamE m exp
                           | True   = LamE m $ substExp n s exp
 substExp n s (TupE exps) = TupE $ map (substExp n s) exps
 substExp n s (CondE e1 e2 e3) = CondE (substExp n s e1) (substExp n s e2) (substExp n s e3)
-substExp n s (LetE decs exp) = LetE (map (substDec n s) decs) (substExp n s exp)
+substExp n s (LetE decs exp) | any (\(ValD m _) -> n == m) decs = LetE decs exp
+                             | True                             = LetE (map (substDec n s) decs) (substExp n s exp)
 substExp n s (CaseE exp matches) = CaseE (substExp n s exp) $ map (substMatch n s) matches
 substExp n s (ListE exps) = ListE $ map (substExp n s) exps
 substExp n s ReturnE = ReturnE
@@ -479,8 +484,9 @@ liftPatAST pat = return pat
 -- | Lifting match-constructs.
 liftMatchAST :: Match -> LiftQ Match
 liftMatchAST (Match pat exp) = do
-  exp' <- liftExpAST exp
-  return $ Match pat exp' 
+  let vars = Set.toList $ getVarNames pat
+  exp' <- withBoundVars vars $ liftExpAST exp
+  return $ Match pat $ foldr (\n e -> AppE (LamE n e) $ AppE ReturnE $ VarE n) exp' vars
 
 -- | Lifting declarations.
 liftDecAST :: Dec -> LiftQ Dec
@@ -494,18 +500,26 @@ liftFirstLevelDecAST (ValD name exp) = withBoundVar name $ do
   exp' <- liftExpAST exp
   return $ ValD name exp'
 
+namesLiftP :: [Name]
+namesLiftP = ['liftP0, 'liftP, 'liftP2, 'liftP3, 'liftP4, 'liftP5]
+
 -- | Lifting expressions.
 liftExpAST :: Exp -> LiftQ Exp
 
+liftExpAST (VarE x) | elem x namesLiftP =
+  errorMsg (show x ++ " must be applied directly to an argument")
+
 liftExpAST (VarE x) = do
-  template_name <- lookForTemplate x
-  case template_name of
-    Nothing -> do
-      b <- isBoundVar x
-      if b 
-        then return $ VarE x
-        else return $ AppE ReturnE $ VarE x
-    Just t  -> return $ VarE t
+  b <- isBoundVar x
+  if b
+    then return $ VarE x
+    else do
+      template_name <- lookForTemplate x
+      case template_name of
+        Nothing -> do
+          t <- templateString $ TH.nameBase x
+          errorMsg ("variable " ++ t ++ " undefined")
+        Just t  -> return $ VarE t
 
 liftExpAST (ConE n) = do
   template_name <- lookForTemplate n
@@ -517,6 +531,13 @@ liftExpAST (ConE n) = do
 
 liftExpAST (LitE l) = liftLitAST l
 
+liftExpAST exp@(AppE (VarE n) e) | Just i <- List.elemIndex n namesLiftP = do
+  -- b <- isBoundVar n2
+  -- when b $ errorMsg (show n1 ++ " applied to local name " ++ show n2)
+  fresh_names <- mapM newName $ replicate i "param"
+  let exp' = foldl (\e n -> AppE e (VarE n)) exp fresh_names
+  return $ AppE ReturnE $ foldr (\n e -> LamE n (AppE ReturnE e)) exp' fresh_names
+
 liftExpAST (AppE e1 e2) = do
   e1' <- liftExpAST e1
   e2' <- liftExpAST e2
@@ -525,8 +546,9 @@ liftExpAST (AppE e1 e2) = do
   return $ doE [BindS n1 e1', BindS n2 e2'] $ AppE (VarE n1) (VarE n2)
 
 liftExpAST (LamE n exp) = do
-  exp' <- liftExpAST exp
-  return $ AppE ReturnE $ LamE n exp'
+  exp' <- withBoundVar n $ liftExpAST exp
+  n' <- newName "lambda"
+  return $ AppE ReturnE $ LamE n' $ LetE [ValD n $ AppE ReturnE $ VarE n'] exp'
 
 liftExpAST (TupE exps) = do
   exps' <- mapM liftExpAST exps

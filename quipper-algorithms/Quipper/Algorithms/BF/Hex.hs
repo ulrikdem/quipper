@@ -11,7 +11,7 @@ module Quipper.Algorithms.BF.Hex where
 import Quipper
 import Quipper.Internal.CircLifting
 import Quipper.Libraries.Qram
-import Quipper.Libraries.Arith hiding (template_symb_plus_)
+import Quipper.Libraries.Arith (qdint_of_qulist_bh)
 
 import Prelude hiding (lookup)
 
