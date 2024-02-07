@@ -481,8 +481,9 @@ liftPatAST pat = return pat
 -- | Lifting match-constructs.
 liftMatchAST :: Match -> LiftQ Match
 liftMatchAST (Match pat exp) = do
-  exp' <- liftExpAST exp
-  return $ Match pat exp' 
+  let vars = Set.toList $ getVarNames pat
+  exp' <- withBoundVars vars $ liftExpAST exp
+  return $ Match pat $ foldr (\n e -> AppE (LamE n e) $ AppE ReturnE $ VarE n) exp' vars
 
 -- | Lifting declarations.
 liftDecAST :: Dec -> LiftQ Dec
@@ -500,14 +501,14 @@ liftFirstLevelDecAST (ValD name exp) = withBoundVar name $ do
 liftExpAST :: Exp -> LiftQ Exp
 
 liftExpAST (VarE x) = do
-  template_name <- lookForTemplate x
-  case template_name of
-    Nothing -> do
-      b <- isBoundVar x
-      if b 
-        then return $ VarE x
-        else return $ AppE ReturnE $ VarE x
-    Just t  -> return $ VarE t
+  b <- isBoundVar x
+  if b
+    then return $ VarE x
+    else do
+      template_name <- lookForTemplate x
+      case template_name of
+        Nothing -> return $ AppE ReturnE $ VarE x
+        Just t  -> return $ VarE t
 
 liftExpAST (ConE n) = do
   template_name <- lookForTemplate n
@@ -527,8 +528,9 @@ liftExpAST (AppE e1 e2) = do
   return $ doE [BindS n1 e1', BindS n2 e2'] $ AppE (VarE n1) (VarE n2)
 
 liftExpAST (LamE n exp) = do
-  exp' <- liftExpAST exp
-  return $ AppE ReturnE $ LamE n exp'
+  exp' <- withBoundVar n $ liftExpAST exp
+  n' <- newName "lambda"
+  return $ AppE ReturnE $ LamE n' $ LetE [ValD n $ AppE ReturnE $ VarE n'] exp'
 
 liftExpAST (TupE exps) = do
   exps' <- mapM liftExpAST exps
