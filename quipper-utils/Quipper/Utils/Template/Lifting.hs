@@ -97,6 +97,7 @@ getVarNames :: Pat -> Set Name
 getVarNames (VarP n) = Set.singleton n
 getVarNames (TupP pats) = Set.unions $ map getVarNames pats
 getVarNames (ListP pats) = Set.unions $ map getVarNames pats
+getVarNames (ConP _ pats) = Set.unions $ map getVarNames pats
 getVarNames _ = Set.empty
 
 -- | Substitution in a @'Match'@.
@@ -121,7 +122,8 @@ substExp n s (LamE m exp) | n == m = LamE m exp
                           | True   = LamE m $ substExp n s exp
 substExp n s (TupE exps) = TupE $ map (substExp n s) exps
 substExp n s (CondE e1 e2 e3) = CondE (substExp n s e1) (substExp n s e2) (substExp n s e3)
-substExp n s (LetE decs exp) = LetE (map (substDec n s) decs) (substExp n s exp)
+substExp n s (LetE decs exp) | any (\(ValD m _) -> n == m) decs = LetE decs exp
+                             | True                             = LetE (map (substDec n s) decs) (substExp n s exp)
 substExp n s (CaseE exp matches) = CaseE (substExp n s exp) $ map (substMatch n s) matches
 substExp n s (ListE exps) = ListE $ map (substExp n s) exps
 substExp n s ReturnE = ReturnE
