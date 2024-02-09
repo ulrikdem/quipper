@@ -77,6 +77,7 @@ module Quipper.Internal.CircLifting (
 
 
   -- * Circuits for specific operations
+  template_getParam,
   -- ** Boolean parameters
   
   template_newBool,
@@ -296,6 +297,9 @@ decToCircMonad x = decToMonad "Circ" x
 
 -- ----------------------------------------------------------------------
 -- * Circuits for specific operations
+
+template_getParam :: (QShape ba qa ca) => Circ (Param ba -> Circ qa)
+template_getParam = return $ \(Param x) -> qinit x
 
 -- ** Boolean parameters
 
