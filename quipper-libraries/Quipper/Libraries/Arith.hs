@@ -108,6 +108,11 @@ module Quipper.Libraries.Arith (
   -- * Lifting of arithmetic functions
   -- $LIFTING
   template_symb_plus_,
+  template_symb_star_,
+  template_symb_minus_,
+  template_negate,
+  template_abs,
+  template_signum,
   ) where
 
 import Quipper
@@ -1752,5 +1757,22 @@ q_ext_euclid a b = do
 template_symb_plus_ :: (QNum qa) => Circ (qa -> Circ (qa -> Circ qa))
 template_symb_plus_ = return $ \qx -> return $ \qy -> do (qx,qy,qz) <- q_add qx qy; return qz
 
--- TODO: complete templates of methods.
+-- | Quantum lifting of the '*' operator.
+template_symb_star_ :: (QNum qa) => Circ (qa -> Circ (qa -> Circ qa))
+template_symb_star_ = return $ \qx -> return $ \qy -> do (qx,qy,qz) <- q_mult qx qy; return qz
 
+-- | Quantum lifting of the '-' operator.
+template_symb_minus_ :: (QNum qa) => Circ (qa -> Circ (qa -> Circ qa))
+template_symb_minus_ = return $ \qx -> return $ \qy -> do (qx,qy,qz) <- q_sub qx qy; return qz
+
+-- | Quantum lifting of the 'negate' function.
+template_negate :: (QNum qa) => Circ (qa -> Circ qa)
+template_negate = return $ \qx -> do (qx,qy) <- q_negate qx; return qy
+
+-- | Quantum lifting of the 'abs' function.
+template_abs :: (QNum qa) => Circ (qa -> Circ qa)
+template_abs = return $ \qx -> do (qx,qy) <- q_abs qx; return qy
+
+-- | Quantum lifting of the 'signum' function.
+template_signum :: (QNum qa) => Circ (qa -> Circ qa)
+template_signum = return $ \qx -> do (qx,qy) <- q_signum qx; return qy

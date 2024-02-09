@@ -10,7 +10,6 @@ import Quipper.Utils.Auxiliary
 
 import Control.Monad
 
-import Quipper.Libraries.Arith hiding (template_symb_plus_)
 import Quipper.Algorithms.QLS.Utils
 import Quipper.Algorithms.QLS.QDouble
 import Quipper.Algorithms.QLS.RealFunc
