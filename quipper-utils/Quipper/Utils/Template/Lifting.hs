@@ -507,7 +507,9 @@ liftExpAST (VarE x) = do
     else do
       template_name <- lookForTemplate x
       case template_name of
-        Nothing -> return $ AppE ReturnE $ VarE x
+        Nothing -> do
+          t <- templateString $ TH.nameBase x
+          errorMsg ("variable " ++ t ++ " undefined")
         Just t  -> return $ VarE t
 
 liftExpAST (ConE n) = do
