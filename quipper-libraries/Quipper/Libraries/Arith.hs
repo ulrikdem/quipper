@@ -113,6 +113,10 @@ module Quipper.Libraries.Arith (
   template_negate,
   template_abs,
   template_signum,
+  template_list_of_xint_bh,
+  template_xint_of_list_bh,
+  template_list_of_xint_lh,
+  template_xint_of_list_lh,
   ) where
 
 import Quipper
@@ -1776,3 +1780,15 @@ template_abs = return $ \qx -> do (qx,qy) <- q_abs qx; return qy
 -- | Quantum lifting of the 'signum' function.
 template_signum :: (QNum qa) => Circ (qa -> Circ qa)
 template_signum = return $ \qx -> do (qx,qy) <- q_signum qx; return qy
+
+template_list_of_xint_bh :: Circ (XInt x -> Circ [x])
+template_list_of_xint_bh = return $ return . list_of_xint_bh
+
+template_xint_of_list_bh :: Circ ([x] -> Circ (XInt x))
+template_xint_of_list_bh = return $ return . xint_of_list_bh
+
+template_list_of_xint_lh :: Circ (XInt x -> Circ [x])
+template_list_of_xint_lh = return $ return . list_of_xint_lh
+
+template_xint_of_list_lh :: Circ ([x] -> Circ (XInt x))
+template_xint_of_list_lh = return $ return . xint_of_list_lh
